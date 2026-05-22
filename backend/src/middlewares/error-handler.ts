@@ -1,6 +1,16 @@
 import { Response, Request, NextFunction } from 'express';
 
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+interface IAppError extends Error {
+  statusCode?: number;
+  code?: number;
+}
+
+const errorHandler = (
+  err: IAppError,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   if (err.code === 11000) {
     return res.status(409).send({
       message: 'Товар с таким заголовком (title) уже существует',
@@ -10,7 +20,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   const statusCode = err.statusCode || 500;
   const message = err.statusCode ? err.message : 'На сервере произошла ошибка';
 
-  res.status(statusCode).send({
-    message,
-  });
+  return res.status(statusCode).send({ message });
 };
+
+export default errorHandler;

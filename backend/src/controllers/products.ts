@@ -2,17 +2,15 @@ import { Request, Response } from 'express';
 import Product from '../models/product';
 
 // Получает список всех товаров
-export const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (_req: Request, res: Response) => {
   try {
     const items = await Product.find();
-    res.send({
+    return res.send({
       items,
-      totsl: items.length,
+      total: items.length,
     });
   } catch (error) {
-    res.status(500).send({
-      message: 'Ошибка на стороне сервера',
-    });
+    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
@@ -29,14 +27,15 @@ export const createProduct = async (req: Request, res: Response) => {
       description,
       price,
     });
-    res.status(201).send(newProduct);
-  } catch (error: any) {
-    if (error.code === 11000) {
+    return res.status(201).send(newProduct);
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
       return res.status(409).send({
         message: 'Товар с таким title уже существует',
       });
     }
-    res.status(400).send({
+
+    return res.status(400).send({
       message: 'Некорректные данные при создании товара',
     });
   }
